@@ -7,3 +7,30 @@
 body {
     margin: 0;
 }
+/*  MAP MARKER STYLES  */
+.map-marker {
+    background-color: #3388ff; 
+    border: 3px solid white;    
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3); 
+    transition: opacity 0.3s ease;
+}
+.map-marker::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #3388ff;
+    animation: pulsar 2s infinite ease-out;
+}
+.marker-hidden {
+    opacity: 0 !important;
+    pointer-events: none; 
+}
+/* MAP GRID */
+.grid-line {
+    stroke: red; 
+    stroke-width: 0.5;
+    pointer-events: none; 
+}
