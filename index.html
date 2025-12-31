@@ -12,7 +12,22 @@
 <body>
 
     <div id="map"></div>
-    <button id="center-btn">📍</button>
+    
+    <div class="custom-controls">
+        <div class="zoom-btn">
+            <button id="zoom-in-btn" class="map-btn map-zoom">+</button>
+            <button id="zoom-out-btn" class="map-btn map-zoom">-</button>
+        </div>
+            <button id="center-btn" class="map-btn map-center"><div class="circle"></div></button>
+        
+        <div class="paint-opt">
+        <button id="paint-btn" class="map-btn map-paint">Paint</button>
+        <input type="color" id="color-picker" value="#ff0000">
+    </div>    
+    </div>
+
+    
+
     <canvas id="grid-canvas"></canvas>
     <script src="https://unpkg.com/leaflet-virtual-grid@1.0.4/dist/leaflet-virtual-grid.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

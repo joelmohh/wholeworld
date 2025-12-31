@@ -18,7 +18,7 @@ body {
     margin: 0;
     overflow: hidden;
 }
-/*  MAP MARKER STYLES  */
+
 .map-marker {
     background-color: #3388ff; 
     border: 3px solid white;    
@@ -26,6 +26,7 @@ body {
     box-shadow: 0 0 10px rgba(0,0,0,0.3); 
     transition: opacity 0.3s ease;
 }
+
 .map-marker::after {
     content: '';
     display: block;
@@ -35,31 +36,91 @@ body {
     background-color: #3388ff;
     animation: pulsar 2s infinite ease-out;
 }
+
 .marker-hidden {
     opacity: 0 !important;
     pointer-events: none; 
 }
-/* MAP GRID */
+
 .grid-line {
     stroke: red; 
     stroke-width: 0.5;
     pointer-events: none; 
 }
-#center-btn {
+
+.custom-controls {
     position: absolute;
     top: 20px;
     right: 20px;
-    z-index: 1000; 
-    padding: 10px 15px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.map-btn {
+    width: 45px;
+    height: 45px;
     background: white;
     border: none;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     cursor: pointer;
     font-weight: bold;
-    pointer-events: auto; 
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    transition: background 0.2s;
+    color: #3388ff;
 }
 
-#center-btn:hover {
+.map-btn:hover {
     background: #f0f0f0;
+}
+.zoom-btn{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #f0f0f0;
+    padding: 5px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.map-center{
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+}
+.circle{
+    content: '';
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 3px dashed #3388FF;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    transition: border-color 0.3s;
+}
+.current{
+    background-color: #3388FF;
+    border-color: rgba(255, 255, 255, 0.7);
+}
+.circle:hover{
+    border-color: blue;
+}
+@keyframes pulsar {
+    0% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
+.paint-opt{
+    display: fixed;
+    bottom: 0;
+    left: 50%;
 }

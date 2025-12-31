@@ -1,6 +1,7 @@
 import { initGrid, drawGrid } from './grid.js';
 
 var map = L.map('map', {
+    zoomControl: false,
     minZoom: 3,
     maxBounds: [[-85, -180], [85, 180]],
     maxBoundsViscosity: 1.0,
@@ -33,6 +34,7 @@ function getUserLocation() {
         null,
         { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
     );
+    document.querySelector('.circle').classList.add('current');
 }
 getUserLocation();
 
@@ -45,8 +47,8 @@ map.on('zoomstart', () => {
 map.on('zoomanim', (e) => {
     const canvas = document.getElementById('grid-canvas');
     const scale = map.getZoomScale(e.zoom, map.getZoom());
-    const offset = map._getCenterOffset(e.center).divideBy(1 - 1/scale);
-    canvas.style.transformOrigin = `${offset.x + canvas.width/2}px ${offset.y + canvas.height/2}px`;
+    const offset = map._getCenterOffset(e.center).divideBy(1 - 1 / scale);
+    canvas.style.transformOrigin = `${offset.x + canvas.width / 2}px ${offset.y + canvas.height / 2}px`;
     canvas.style.transform = `scale(${scale})`;
 });
 
@@ -59,9 +61,21 @@ map.on('moveend zoomend viewreset', () => {
 
 map.on('move', () => {
     if (!map._animatingZoom) drawGrid();
+    if (map.getCenter().distanceTo(markerPlayer.getLatLng()) > 1) {
+        document.querySelector('.circle').classList.remove('current');
+    } else {
+        document.querySelector('.circle').classList.add('current');
+    }
 });
 
-const centerBtn = document.getElementById('center-btn');
-centerBtn.addEventListener('click', () => {
+document.getElementById('zoom-in-btn').addEventListener('click', () => {
+    map.zoomIn();
+});
+
+document.getElementById('zoom-out-btn').addEventListener('click', () => {
+    map.zoomOut();
+});
+
+document.getElementById('center-btn').addEventListener('click', () => {
     map.setView(markerPlayer.getLatLng(), 16, { animate: true });
 });
