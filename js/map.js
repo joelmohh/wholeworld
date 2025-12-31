@@ -22,63 +22,46 @@ var mapMarker = L.divIcon({
 var markerPlayer = L.marker([0, 0], { icon: mapMarker }).addTo(map).bindPopup("Você está aqui!");
 
 function getUserLocation() {
-
-    if (!navigator.geolocation) {
-        return { success: false, message: "Geolocation not supported" }
-    }
-    const options = {
-        enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: 0
-    }
-    function success(position) {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-
-        markerPlayer.setLatLng([lat, lng]);
-        map.setView([lat, lng], 16);
-
-    }
-    function error(err) {
-        console.warn(`ERROR(${err.code}): ${err.message}`);
-        return { success: false, message: err.message }
-    }
-
-    navigator.geolocation.getCurrentPosition(success, error, options);
-
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+        (pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            markerPlayer.setLatLng([lat, lng]);
+            map.setView([lat, lng], 16);
+        },
+        null,
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+    );
 }
 getUserLocation();
 
-const maxZoom = 15
-
-map.on('zoomend', function () {
-    var currentZoom = map.getZoom();
-    var element = markerPlayer.getElement();
-
-    if (element) {
-        if (currentZoom < maxZoom) {
-            element.classList.add('marker-hidden');
-        } else {
-            element.classList.remove('marker-hidden');
-        }
-    }
-});
-
 initGrid(map);
 
-map.on('move zoom moveend zoomend', () => {
+map.on('zoomstart', () => {
+    document.getElementById('grid-canvas').style.transition = 'transform 0.25s cubic-bezier(0,0,0.25,1)';
+});
+
+map.on('zoomanim', (e) => {
+    const canvas = document.getElementById('grid-canvas');
+    const scale = map.getZoomScale(e.zoom, map.getZoom());
+    const offset = map._getCenterOffset(e.center).divideBy(1 - 1/scale);
+    canvas.style.transformOrigin = `${offset.x + canvas.width/2}px ${offset.y + canvas.height/2}px`;
+    canvas.style.transform = `scale(${scale})`;
+});
+
+map.on('moveend zoomend viewreset', () => {
+    const canvas = document.getElementById('grid-canvas');
+    canvas.style.transition = 'none';
+    canvas.style.transform = 'none';
     drawGrid();
 });
 
-const centerBtn = document.getElementById('center-btn');
+map.on('move', () => {
+    if (!map._animatingZoom) drawGrid();
+});
 
+const centerBtn = document.getElementById('center-btn');
 centerBtn.addEventListener('click', () => {
-    const currentPos = markerPlayer.getLatLng();
-    
-    map.setView(currentPos, 16, {
-        animate: true,
-        pan: {
-            duration: 1
-        }
-    });
+    map.setView(markerPlayer.getLatLng(), 16, { animate: true });
 });
