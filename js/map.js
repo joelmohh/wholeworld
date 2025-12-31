@@ -5,7 +5,8 @@ var map = L.map('map', {
     minZoom: 3,
     maxBounds: [[-85, -180], [85, 180]],
     maxBoundsViscosity: 1.0,
-    attributionControl: false
+    attributionControl: false,
+    zoomSnap: 0
 }).setView([0, 0], 16);
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -66,9 +67,19 @@ map.on('zoomend', function () {
 
 let gridLayer = L.layerGroup().addTo(map);
 
-map.on('moveend zoomend', drawGrid);
-drawGrid();
-map.on('zoom', function () {
-    console.log("Map is zooming");
-    console.log("Current zoom level: " + map.getZoom());
+map.on('move zoom', () => drawGrid(map));
+drawGrid(map);
+const centerBtn = document.getElementById('center-btn');
+
+centerBtn.addEventListener('click', () => {
+    // Pega a latitude e longitude atual do marcador do jogador
+    const currentPos = markerPlayer.getLatLng();
+    
+    // Centraliza o mapa com animação suave
+    map.setView(currentPos, 16, {
+        animate: true,
+        pan: {
+            duration: 1
+        }
+    });
 });

@@ -1,11 +1,22 @@
 #map {
     height: 100vh;
     width: 100%;
-    background-color: #f2f2f2;
+    z-index: 0;
+}
+
+#grid-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none; /* Deixa os cliques passarem para o mapa */
 }
 
 body {
     margin: 0;
+    overflow: hidden;
 }
 /*  MAP MARKER STYLES  */
 .map-marker {
@@ -33,4 +44,22 @@ body {
     stroke: red; 
     stroke-width: 0.5;
     pointer-events: none; 
+}
+#center-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000; 
+    padding: 10px 15px;
+    background: white;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+    font-weight: bold;
+    pointer-events: auto; 
+}
+
+#center-btn:hover {
+    background: #f0f0f0;
 }
