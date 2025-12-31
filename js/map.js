@@ -1,6 +1,5 @@
-import { drawGrid } from './grid.js';
+import { initGrid, drawGrid } from './grid.js';
 
-// Initializate the map with the player location
 var map = L.map('map', {
     minZoom: 3,
     maxBounds: [[-85, -180], [85, 180]],
@@ -9,7 +8,7 @@ var map = L.map('map', {
     zoomSnap: 0
 }).setView([0, 0], 16);
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
     subdomains: 'abcd',
     maxZoom: 20,
 }).addTo(map);
@@ -65,17 +64,17 @@ map.on('zoomend', function () {
     }
 });
 
-let gridLayer = L.layerGroup().addTo(map);
+initGrid(map);
 
-map.on('move zoom', () => drawGrid(map));
-drawGrid(map);
+map.on('move zoom moveend zoomend', () => {
+    drawGrid();
+});
+
 const centerBtn = document.getElementById('center-btn');
 
 centerBtn.addEventListener('click', () => {
-    // Pega a latitude e longitude atual do marcador do jogador
     const currentPos = markerPlayer.getLatLng();
     
-    // Centraliza o mapa com animação suave
     map.setView(currentPos, 16, {
         animate: true,
         pan: {
