@@ -2,9 +2,9 @@ const canvas = document.getElementById("grid-canvas");
 const ctx = canvas.getContext("2d");
 
 let currentMap = null;
-const CHUNK_SIZE = 4; 
-const GRID_SIZE = 4; 
-const REFERENCE_ZOOM = 15; 
+const CHUNK_SIZE = 4;
+const GRID_SIZE = 4;
+const REFERENCE_ZOOM = 15;
 
 let selectedPixels = []
 export var paintMode = false;
@@ -47,11 +47,11 @@ function onClick(e) {
     const scale = Math.pow(2, zoom - REFERENCE_ZOOM);
     const center = currentMap.getCenter();
     const centerGlobal = latLngToGlobalPixels(center.lat, center.lng);
-    
+
     // Global pixel coordinates of the click
     const globalX = centerGlobal.x + (e.clientX - rect.left - canvas.width / 2) / scale;
     const globalY = centerGlobal.y + (e.clientY - rect.top - canvas.height / 2) / scale;
-    
+
     // Grid coordinates
     const gridX = Math.floor(globalX / GRID_SIZE);
     const gridY = Math.floor(globalY / GRID_SIZE);
@@ -59,12 +59,12 @@ function onClick(e) {
     const coords = globalPixelsToLatLng(globalX, globalY);
 
     selectedPixels.push({ gridX, gridY, lat: coords.lat, lng: coords.lng });
-    console.log("Selected Pixels:", selectedPixels);    
+    console.log("Selected Pixels:", selectedPixels);
 
-    if(paintMode) {
-        
+    if (paintMode) {
+
     }
-   
+
 }
 
 function onMouseMove(e) {
@@ -74,13 +74,13 @@ function onMouseMove(e) {
     const scale = Math.pow(2, zoom - REFERENCE_ZOOM);
     const center = currentMap.getCenter();
     const centerGlobal = latLngToGlobalPixels(center.lat, center.lng);
-    
+
     const globalX = centerGlobal.x + (e.clientX - rect.left - canvas.width / 2) / scale;
     const globalY = centerGlobal.y + (e.clientY - rect.top - canvas.height / 2) / scale;
-    
+
     const chunkX = Math.floor(globalX / CHUNK_SIZE);
     const chunkY = Math.floor(globalY / CHUNK_SIZE);
-    
+
     if (!hoveredChunk || hoveredChunk.chunkX !== chunkX || hoveredChunk.chunkY !== chunkY) {
         hoveredChunk = { chunkX, chunkY };
         drawGrid();
@@ -104,13 +104,13 @@ export function drawGrid() {
     }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     const scale = Math.pow(2, zoom - REFERENCE_ZOOM);
     const centerGlobal = latLngToGlobalPixels(center.lat, center.lng);
-    
+
     const screenCenterX = canvas.width / 2;
     const screenCenterY = canvas.height / 2;
-    
+
     const topLeftGlobalX = centerGlobal.x - screenCenterX / scale;
     const topLeftGlobalY = centerGlobal.y - screenCenterY / scale;
     const bottomRightGlobalX = centerGlobal.x + screenCenterX / scale;
@@ -119,7 +119,7 @@ export function drawGrid() {
     ctx.beginPath();
     ctx.strokeStyle = 'rgba(100, 150, 255, 0)';
     ctx.lineWidth = Math.max(0.5, scale * 0.4);
-    
+
     const startGridX = Math.floor(topLeftGlobalX / GRID_SIZE) * GRID_SIZE;
     for (let gX = startGridX; gX <= bottomRightGlobalX; gX += GRID_SIZE) {
         const sX = (gX - centerGlobal.x) * scale + screenCenterX;
@@ -134,6 +134,16 @@ export function drawGrid() {
         ctx.lineTo(canvas.width, sY);
     }
     ctx.stroke();
+    selectedPixels.forEach(pixel => {
+        const cX = pixel.gridX * GRID_SIZE;
+        const cY = pixel.gridY * GRID_SIZE;
+        const sX = (cX - centerGlobal.x) * scale + screenCenterX;
+        const sY = (cY - centerGlobal.y) * scale + screenCenterY;
+        const size = GRID_SIZE * scale;
+
+        ctx.fillStyle = 'rgba(0, 100, 255, 0.8)';
+        ctx.fillRect(sX, sY, size, size);
+    });
 
     if (hoveredChunk) {
         const cX = hoveredChunk.chunkX * CHUNK_SIZE;
