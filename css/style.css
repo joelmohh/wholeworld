@@ -190,7 +190,7 @@ body {
     background-color: #f8faff;
     border-radius: 14px 14px 0 0;
     box-shadow: 0 -6px 24px rgba(0,0,0,0.08);
-    width: min(100%, 620px);
+    width: calc(100% - 35px);
     z-index: 2000;
     display: grid;
     grid-template-rows: auto 1fr auto;
@@ -235,14 +235,14 @@ body {
 .choice {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 5px;
     padding: 4px;
 }
 
 .color-option {
-    width: 45px;
-    height: 45px;
-    border-radius: 8px;
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
     border: 2px solid transparent;
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);

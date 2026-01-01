@@ -102,7 +102,7 @@ function globalPixelsToLatLng(x, y) {
 }
 
 function onClick(e) {
-    if (!currentMap || currentMap._animatingZoom) return;
+    if (!currentMap || currentMap._animatingZoom || !paintMode) return;
     const rect = canvas.getBoundingClientRect();
     const zoom = currentMap.getZoom();
     const scale = Math.pow(2, zoom - REFERENCE_ZOOM);
@@ -121,7 +121,7 @@ function onClick(e) {
 
     selectedPixels.push({ gridX, gridY, lat: coords.lat, lng: coords.lng, color: getSelectedColor });
     console.log("Selected Pixels:", selectedPixels);
-
+    drawGrid();
 }
 
 function onMouseMove(e) {
@@ -191,19 +191,18 @@ export function drawGrid() {
         ctx.lineTo(canvas.width, sY);
     }
     ctx.stroke();
-    if (paintMode) {
-        selectedPixels.forEach(pixel => {
-            const cX = pixel.gridX * GRID_SIZE;
-            const cY = pixel.gridY * GRID_SIZE;
-            const sX = (cX - centerGlobal.x) * scale + screenCenterX;
-            const sY = (cY - centerGlobal.y) * scale + screenCenterY;
-            const size = GRID_SIZE * scale;
+    
+    selectedPixels.forEach(pixel => {
+        const cX = pixel.gridX * GRID_SIZE;
+        const cY = pixel.gridY * GRID_SIZE;
+        const sX = (cX - centerGlobal.x) * scale + screenCenterX;
+        const sY = (cY - centerGlobal.y) * scale + screenCenterY;
+        const size = GRID_SIZE * scale;
 
-            const rgbColor = colorMap[pixel.color] || 'rgb(0, 100, 255)';
-            ctx.fillStyle = rgbColor;
-            ctx.fillRect(sX, sY, size, size);
-        });
-    }
+        const rgbColor = colorMap[pixel.color] || 'rgb(0, 100, 255)';
+        ctx.fillStyle = rgbColor;
+        ctx.fillRect(sX, sY, size, size);
+    });
 
     if (hoveredChunk) {
         const cX = hoveredChunk.chunkX * CHUNK_SIZE;
