@@ -2,8 +2,8 @@ const canvas = document.getElementById("grid-canvas");
 const ctx = canvas.getContext("2d");
 
 let currentMap = null;
-const CHUNK_SIZE = 16; 
-const GRID_SIZE = 16; 
+const CHUNK_SIZE = 4; 
+const GRID_SIZE = 4; 
 const REFERENCE_ZOOM = 15; 
 
 let hoveredChunk = null;

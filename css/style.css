@@ -92,6 +92,7 @@ body {
     position: fixed;
     bottom: 20px;
     right: 20px;
+    z-index: 1000;
 }
 .circle{
     content: '';
@@ -120,7 +121,93 @@ body {
     }
 }
 .paint-opt{
-    display: fixed;
-    bottom: 0;
-    left: 50%;
+    position: fixed;
+    bottom: 0px;
+    left: 0;
+    z-index: 1000;
+    border: 1px solid red;
+    width: 100%;
+}
+.hidden{
+    display: none;
+}
+.btn{
+    padding: 12px 30px;
+    background-color: #3388ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    border: 2px solid #2c75db;
+}
+.btn:hover{
+    background-color: #3687f9;
+}
+.colors{
+    margin-top: 10px;
+    background-color: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    width: 240vh;
+    z-index: 2000;
+    height: 10rem;
+}
+#startPaint{
+   margin-left: calc(50% - 5vh);
+   margin-bottom: 19px;
+}
+#closeColorsChoice{
+    position: absolute;
+    top: 20px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+.erase{
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+.paintConfirm{
+    
+    text-align: center;
+}
+.erase .btn{
+    padding: 10px 14px;
+    border-radius: 100%;
+}
+.choice div{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0 10px;
+    cursor: pointer;
+}
+.red{
+    background-color: red;
+}
+.blue{
+    background-color: blue;
+}
+.green{
+    background-color: green;
+}
+.yellow{
+    background-color: yellow;
+}
+.white{
+    background-color: white;
+    border: 1px solid black;
+}
+.black{
+    background-color: black;
 }
