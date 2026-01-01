@@ -9,7 +9,14 @@ const GRID_SIZE = 4;
 const REFERENCE_ZOOM = 15;
 
 let selectedPixels = []
-export var paintMode = false;
+var paintMode = false;
+export function tooglePaintMode() {
+    if(paintMode){
+        paintMode = false;
+    } else {
+        paintMode = true;
+    }
+}
 
 const colorMap = {
     red: 'rgb(255, 0, 0)',
@@ -115,10 +122,6 @@ function onClick(e) {
     selectedPixels.push({ gridX, gridY, lat: coords.lat, lng: coords.lng, color: getSelectedColor });
     console.log("Selected Pixels:", selectedPixels);
 
-    if (paintMode) {
-
-    }
-
 }
 
 function onMouseMove(e) {
@@ -188,17 +191,19 @@ export function drawGrid() {
         ctx.lineTo(canvas.width, sY);
     }
     ctx.stroke();
-    selectedPixels.forEach(pixel => {
-        const cX = pixel.gridX * GRID_SIZE;
-        const cY = pixel.gridY * GRID_SIZE;
-        const sX = (cX - centerGlobal.x) * scale + screenCenterX;
-        const sY = (cY - centerGlobal.y) * scale + screenCenterY;
-        const size = GRID_SIZE * scale;
+    if (paintMode) {
+        selectedPixels.forEach(pixel => {
+            const cX = pixel.gridX * GRID_SIZE;
+            const cY = pixel.gridY * GRID_SIZE;
+            const sX = (cX - centerGlobal.x) * scale + screenCenterX;
+            const sY = (cY - centerGlobal.y) * scale + screenCenterY;
+            const size = GRID_SIZE * scale;
 
-        const rgbColor = colorMap[pixel.color] || 'rgb(0, 100, 255)';
-        ctx.fillStyle = rgbColor;
-        ctx.fillRect(sX, sY, size, size);
-    });
+            const rgbColor = colorMap[pixel.color] || 'rgb(0, 100, 255)';
+            ctx.fillStyle = rgbColor;
+            ctx.fillRect(sX, sY, size, size);
+        });
+    }
 
     if (hoveredChunk) {
         const cX = hoveredChunk.chunkX * CHUNK_SIZE;
