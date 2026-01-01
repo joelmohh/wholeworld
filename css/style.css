@@ -346,3 +346,6 @@ body {
     border-radius: 10px;
     min-width: 52px;
 }
+.hidden {
+    display: none;
+}
