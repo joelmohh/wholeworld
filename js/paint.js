@@ -5,7 +5,7 @@ const colorsChoices = document.getElementById('colorsChoices');
 const closeColorsChoiceBtn = document.getElementById('closeColorsChoice');
 const colorOptions = Array.from(document.querySelectorAll('.color-option'));
 
-let selectedColor = colorOptions[0]?.dataset.color || null;
+export let selectedColor = colorOptions[0]?.dataset.color || null;
 
 startPaintBtn.addEventListener('click', () => {
     startPaintBtn.classList.add('hidden');

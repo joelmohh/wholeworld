@@ -1,3 +1,5 @@
+import { selectedColor as getSelectedColor } from './paint.js';
+
 const canvas = document.getElementById("grid-canvas");
 const ctx = canvas.getContext("2d");
 
@@ -8,6 +10,58 @@ const REFERENCE_ZOOM = 15;
 
 let selectedPixels = []
 export var paintMode = false;
+
+const colorMap = {
+    red: 'rgb(255, 0, 0)',
+    crimson: 'rgb(220, 20, 60)',
+    rose: 'rgb(255, 102, 178)',
+    pink: 'rgb(255, 192, 203)',
+    fuchsia: 'rgb(255, 0, 255)',
+    magenta: 'rgb(255, 0, 255)',
+    purple: 'rgb(128, 0, 128)',
+    violet: 'rgb(238, 130, 238)',
+    indigo: 'rgb(75, 0, 130)',
+    blue: 'rgb(0, 0, 255)',
+    sky: 'rgb(135, 206, 235)',
+    cyan: 'rgb(0, 255, 255)',
+    teal: 'rgb(0, 128, 128)',
+    emerald: 'rgb(80, 200, 120)',
+    green: 'rgb(0, 128, 0)',
+    lime: 'rgb(0, 255, 0)',
+    chartreuse: 'rgb(127, 255, 0)',
+    yellow: 'rgb(255, 255, 0)',
+    amber: 'rgb(255, 191, 0)',
+    orange: 'rgb(255, 165, 0)',
+    coral: 'rgb(255, 127, 80)',
+    tomato: 'rgb(255, 99, 71)',
+    salmon: 'rgb(250, 128, 114)',
+    peach: 'rgb(255, 218, 185)',
+    brown: 'rgb(165, 42, 42)',
+    chocolate: 'rgb(210, 105, 30)',
+    sienna: 'rgb(160, 82, 45)',
+    tan: 'rgb(210, 180, 140)',
+    khaki: 'rgb(240, 230, 200)',
+    olive: 'rgb(128, 128, 0)',
+    gold: 'rgb(255, 215, 0)',
+    silver: 'rgb(192, 192, 192)',
+    white: 'rgb(255, 255, 255)',
+    lightgray: 'rgb(211, 211, 211)',
+    gray: 'rgb(128, 128, 128)',
+    darkgray: 'rgb(169, 169, 169)',
+    slate: 'rgb(112, 128, 144)',
+    charcoal: 'rgb(54, 54, 54)',
+    black: 'rgb(0, 0, 0)',
+    navy: 'rgb(0, 0, 128)',
+    maroon: 'rgb(128, 0, 0)',
+    burgundy: 'rgb(128, 0, 32)',
+    plum: 'rgb(221, 160, 221)',
+    lavender: 'rgb(230, 230, 250)',
+    mint: 'rgb(152, 251, 152)',
+    aqua: 'rgb(0, 255, 255)',
+    turquoise: 'rgb(64, 224, 208)',
+    steel: 'rgb(70, 130, 180)',
+    ivory: 'rgb(255, 255, 240)'
+};
 
 let hoveredChunk = null;
 
@@ -58,7 +112,7 @@ function onClick(e) {
 
     const coords = globalPixelsToLatLng(globalX, globalY);
 
-    selectedPixels.push({ gridX, gridY, lat: coords.lat, lng: coords.lng });
+    selectedPixels.push({ gridX, gridY, lat: coords.lat, lng: coords.lng, color: getSelectedColor });
     console.log("Selected Pixels:", selectedPixels);
 
     if (paintMode) {
@@ -141,7 +195,8 @@ export function drawGrid() {
         const sY = (cY - centerGlobal.y) * scale + screenCenterY;
         const size = GRID_SIZE * scale;
 
-        ctx.fillStyle = 'rgba(0, 100, 255, 0.8)';
+        const rgbColor = colorMap[pixel.color] || 'rgb(0, 100, 255)';
+        ctx.fillStyle = rgbColor;
         ctx.fillRect(sX, sY, size, size);
     });
 
