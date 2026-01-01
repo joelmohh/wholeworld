@@ -79,7 +79,7 @@ export function drawGrid() {
     const bottomRightGlobalY = centerGlobal.y + screenCenterY / scale;
 
     ctx.beginPath();
-    ctx.strokeStyle = 'rgba(100, 150, 255, 0.4)';
+    ctx.strokeStyle = 'rgba(100, 150, 255, 0)';
     ctx.lineWidth = Math.max(0.5, scale * 0.4);
     
     const startGridX = Math.floor(topLeftGlobalX / GRID_SIZE) * GRID_SIZE;

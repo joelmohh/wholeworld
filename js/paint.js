@@ -1,8 +1,24 @@
 const startPaintBtn = document.getElementById('startPaint');
+const colorsChoices = document.getElementById('colorsChoices');
+const closeColorsChoiceBtn = document.getElementById('closeColorsChoice');
+const colorOptions = Array.from(document.querySelectorAll('.color-option'));
+
+let selectedColor = colorOptions[0]?.dataset.color || null;
 
 startPaintBtn.addEventListener('click', () => {
-    const colorsChoices = document.getElementById('colorsChoices');
-    document.getElementById('center-btn').classList.toggle('hidden');
-    colorsChoices.classList.toggle('hidden');
-    startPaintBtn.classList.toggle('hidden');
+    startPaintBtn.classList.add('hidden');
+    colorsChoices.classList.remove('hidden');
+});
+
+closeColorsChoiceBtn.addEventListener('click', () => {
+    colorsChoices.classList.add('hidden');
+    startPaintBtn.classList.remove('hidden');
+});
+
+colorOptions.forEach((option) => {
+    option.addEventListener('click', () => {
+        colorOptions.forEach((btn) => btn.classList.remove('active'));
+        option.classList.add('active');
+        selectedColor = option.dataset.color;
+    });
 });

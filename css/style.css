@@ -1,3 +1,27 @@
+/* ========== Global ========== */
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ========== Animations ========== */
+@keyframes pulsar {
+    0% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
+
+/* ========== Map ========== */
 #map {
     height: 100vh;
     width: 100%;
@@ -14,16 +38,18 @@
     pointer-events: none;
 }
 
-body {
-    margin: 0;
-    overflow: hidden;
+.grid-line {
+    stroke: red;
+    stroke-width: 0.5;
+    pointer-events: none;
 }
 
+/* ========== Map Marker ========== */
 .map-marker {
-    background-color: #3388ff; 
-    border: 3px solid white;    
+    background-color: #3388ff;
+    border: 3px solid white;
     border-radius: 50%;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3); 
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
     transition: opacity 0.3s ease;
 }
 
@@ -39,15 +65,10 @@ body {
 
 .marker-hidden {
     opacity: 0 !important;
-    pointer-events: none; 
+    pointer-events: none;
 }
 
-.grid-line {
-    stroke: red; 
-    stroke-width: 0.5;
-    pointer-events: none; 
-}
-
+/* ========== Map Controls ========== */
 .custom-controls {
     position: absolute;
     top: 20px;
@@ -79,7 +100,8 @@ body {
 .map-btn:hover {
     background: #f0f0f0;
 }
-.zoom-btn{
+
+.zoom-btn {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -88,13 +110,15 @@ body {
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
-.map-center{
+
+.map-center {
     position: fixed;
     bottom: 20px;
     right: 20px;
     z-index: 1000;
 }
-.circle{
+
+.circle {
     content: '';
     width: 20px;
     height: 20px;
@@ -103,111 +127,222 @@ body {
     box-shadow: 0 0 5px rgba(0,0,0,0.3);
     transition: border-color 0.3s;
 }
-.current{
+
+.circle:hover {
+    border-color: blue;
+}
+
+.circle.current {
     background-color: #3388FF;
     border-color: rgba(255, 255, 255, 0.7);
 }
-.circle:hover{
-    border-color: blue;
-}
-@keyframes pulsar {
-    0% {
-        transform: scale(1);
-        opacity: 0.7;
-    }
-    100% {
-        transform: scale(2.5);
-        opacity: 0;
-    }
-}
-.paint-opt{
-    position: fixed;
-    bottom: 0px;
-    left: 0;
-    z-index: 1000;
-    border: 1px solid red;
-    width: 100%;
-}
-.hidden{
-    display: none;
-}
-.btn{
+
+/* ========== Buttons ========== */
+.btn {
     padding: 12px 30px;
-    background-color: #3388ff;
-    color: white;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: #3388ff;
+    color: white;
     border: 2px solid #2c75db;
 }
-.btn:hover{
+
+.btn-primary:hover {
     background-color: #3687f9;
 }
-.colors{
-    margin-top: 10px;
-    background-color: white;
-    padding: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    width: 240vh;
+
+.btn-secondary {
+    background: white;
+    color: #4a5772;
+    border: 2px solid #d7deea;
+}
+
+.btn-secondary:hover {
+    background: #f8fafc;
+    border-color: #bbc5d6;
+}
+
+/* ========== Paint Panel ========== */
+.paint-opt {
+    position: fixed;
+    bottom: 0px;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+}
+
+#startPaint {
+    margin-left: calc(50% - 5vh);
+    margin-bottom: 19px;
+}
+
+.colors {
+    margin: 0 auto;
+    padding: 14px 18px 12px;
+    background-color: #f8faff;
+    border-radius: 14px 14px 0 0;
+    box-shadow: 0 -6px 24px rgba(0,0,0,0.08);
+    width: min(100%, 620px);
     z-index: 2000;
-    height: 10rem;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 12px;
 }
-#startPaint{
-   margin-left: calc(50% - 5vh);
-   margin-bottom: 19px;
+
+.colors-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
-#closeColorsChoice{
-    position: absolute;
-    top: 20px;
-    right: 10px;
-    background: transparent;
-    border: none;
-    font-size: 18px;
+
+.colors-title {
+    font-weight: 700;
+    color: #1f2a44;
+    font-size: 16px;
+}
+
+#closeColorsChoice {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid #d7deea;
+    background: #fff;
     cursor: pointer;
-}
-.erase{
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    background: transparent;
-    border: none;
     font-size: 18px;
+    line-height: 1;
+    color: #4a5772;
+    transition: background 0.2s, transform 0.1s;
+}
+
+#closeColorsChoice:hover {
+    background: #eef2fb;
+}
+
+#closeColorsChoice:active {
+    transform: scale(0.96);
+}
+
+/* ========== Color Options ========== */
+.choice {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 4px;
+}
+
+.color-option {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    border: 2px solid transparent;
     cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
-.paintConfirm{
-    
-    text-align: center;
+
+.color-option:hover {
+    transform: scale(1.15);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
 }
-.erase .btn{
+
+.color-option.active {
+    border-color: #1f7bf2;
+    box-shadow: 0 4px 14px rgba(31,123,242,0.4);
+}
+
+/* Color palette */
+/* Reds */
+.red { background-color: #e63946; }
+.crimson { background-color: #dc143c; }
+.rose { background-color: #e11d48; }
+.pink { background-color: #ec4899; }
+.fuchsia { background-color: #d946ef; }
+.magenta { background-color: #c026d3; }
+
+/* Purples & Violets */
+.purple { background-color: #9333ea; }
+.violet { background-color: #8b5cf6; }
+.indigo { background-color: #6366f1; }
+
+/* Blues */
+.blue { background-color: #1d4ed8; }
+.sky { background-color: #0ea5e9; }
+.cyan { background-color: #06b6d4; }
+.teal { background-color: #14b8a6; }
+
+/* Greens */
+.emerald { background-color: #10b981; }
+.green { background-color: #16a34a; }
+.lime { background-color: #84cc16; }
+.chartreuse { background-color: #7fff00; }
+
+/* Yellows & Oranges */
+.yellow { background-color: #eab308; }
+.amber { background-color: #f59e0b; }
+.orange { background-color: #f97316; }
+.coral { background-color: #ff7f50; }
+.tomato { background-color: #ff6347; }
+
+/* Pinks & Salmon */
+.salmon { background-color: #fa8072; }
+.peach { background-color: #ffd7b5; }
+
+/* Browns */
+.brown { background-color: #92400e; }
+.chocolate { background-color: #d2691e; }
+.sienna { background-color: #a0522d; }
+.tan { background-color: #d2b48c; }
+.khaki { background-color: #c3b091; }
+
+/* Earth Tones */
+.olive { background-color: #808000; }
+.gold { background-color: #ffd700; }
+.silver { background-color: #c0c0c0; }
+
+/* Grays & Neutrals */
+.white { background-color: #f8fafc; border: 1px solid #d7deea; }
+.lightgray { background-color: #d1d5db; }
+.gray { background-color: #6b7280; }
+.darkgray { background-color: #4b5563; }
+.slate { background-color: #334155; }
+.charcoal { background-color: #2d3748; }
+.black { background-color: #0f172a; }
+
+/* Dark Tones */
+.navy { background-color: #1e3a8a; }
+.maroon { background-color: #800000; }
+.burgundy { background-color: #991b1b; }
+
+/* Pastels */
+.plum { background-color: #dda0dd; }
+.lavender { background-color: #c4b5fd; }
+.mint { background-color: #a7f3d0; }
+.aqua { background-color: #7dd3fc; }
+.turquoise { background-color: #40e0d0; }
+.steel { background-color: #4682b4; }
+.ivory { background-color: #fffff0; border: 1px solid #d7deea; }
+
+/* ========== Paint Footer ========== */
+.paint-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.paintConfirm {
+    text-align: left;
+}
+
+.erase .btn {
     padding: 10px 14px;
-    border-radius: 100%;
-}
-.choice div{
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: inline-block;
-    margin: 0 10px;
-    cursor: pointer;
-}
-.red{
-    background-color: red;
-}
-.blue{
-    background-color: blue;
-}
-.green{
-    background-color: green;
-}
-.yellow{
-    background-color: yellow;
-}
-.white{
-    background-color: white;
-    border: 1px solid black;
-}
-.black{
-    background-color: black;
+    border-radius: 10px;
+    min-width: 52px;
 }

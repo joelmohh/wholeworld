@@ -7,24 +7,72 @@
     <title>Whole World</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="/css/style.css">
+    <script src="https://kit.fontawesome.com/9721ff28a8.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
     <div class="paint-opt">
-        <button id="startPaint" class="btn btn-primary">Paint</button>
+        <button id="startPaint" class="btn btn-primary"><i class="fa-solid fa-paintbrush"></i> Paint</button>
         <div id="colorsChoices" class="colors hidden">
-            <div class="colors-title">Chose one color</div>
-            <button id="closeColorsChoice">X</button>
-            <div class="choice">
-                <div class="red"></div>
-                <div class="blue"></div>
-                <div class="green"></div>
-                <div class="yellow"></div>
-                <div class="black"></div>
-                <div class="white"></div>
+            <div class="colors-header">
+                <div class="colors-title">Choose a color</div>
+                <button id="closeColorsChoice" aria-label="Fechar seleção de cor"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="paintConfirm"><button id="paintConfirm" class="btn btn-primary">Paint</button></div>
-            <div class="erase"><button class="btn btn-primary">E</button></div>
+            <div class="choice" role="listbox" aria-label="Opções de cor">
+                <button class="color-option red active" data-color="red" aria-label="Vermelho"></button>
+                <button class="color-option crimson" data-color="crimson" aria-label="Carmesim"></button>
+                <button class="color-option rose" data-color="rose" aria-label="Rosa Escuro"></button>
+                <button class="color-option pink" data-color="pink" aria-label="Rosa"></button>
+                <button class="color-option fuchsia" data-color="fuchsia" aria-label="Fúcsia"></button>
+                <button class="color-option magenta" data-color="magenta" aria-label="Magenta"></button>
+                <button class="color-option purple" data-color="purple" aria-label="Roxo"></button>
+                <button class="color-option violet" data-color="violet" aria-label="Violeta"></button>
+                <button class="color-option indigo" data-color="indigo" aria-label="Índigo"></button>
+                <button class="color-option blue" data-color="blue" aria-label="Azul"></button>
+                <button class="color-option sky" data-color="sky" aria-label="Azul Céu"></button>
+                <button class="color-option cyan" data-color="cyan" aria-label="Ciano"></button>
+                <button class="color-option teal" data-color="teal" aria-label="Azul Petróleo"></button>
+                <button class="color-option emerald" data-color="emerald" aria-label="Esmeralda"></button>
+                <button class="color-option green" data-color="green" aria-label="Green"></button>
+                <button class="color-option lime" data-color="lime" aria-label="Lime"></button>
+                <button class="color-option chartreuse" data-color="chartreuse" aria-label="Chartreuse"></button>
+                <button class="color-option yellow" data-color="yellow" aria-label="Yellow"></button>
+                <button class="color-option amber" data-color="amber" aria-label="Amber"></button>
+                <button class="color-option orange" data-color="orange" aria-label="Orange"></button>
+                <button class="color-option coral" data-color="coral" aria-label="Coral"></button>
+                <button class="color-option tomato" data-color="tomato" aria-label="Tomato"></button>
+                <button class="color-option salmon" data-color="salmon" aria-label="Salmon"></button>
+                <button class="color-option peach" data-color="peach" aria-label="Peach"></button>
+                <button class="color-option brown" data-color="brown" aria-label="Brown"></button>
+                <button class="color-option chocolate" data-color="chocolate" aria-label="Chocolate"></button>
+                <button class="color-option sienna" data-color="sienna" aria-label="Sienna"></button>
+                <button class="color-option tan" data-color="tan" aria-label="Tan"></button>
+                <button class="color-option khaki" data-color="khaki" aria-label="Khaki"></button>
+                <button class="color-option olive" data-color="olive" aria-label="Olive"></button>
+                <button class="color-option gold" data-color="gold" aria-label="Gold"></button>
+                <button class="color-option silver" data-color="silver" aria-label="Silver"></button>
+                <button class="color-option white" data-color="white" aria-label="White"></button>
+                <button class="color-option lightgray" data-color="lightgray" aria-label="Light Gray"></button>
+                <button class="color-option gray" data-color="gray" aria-label="Gray"></button>
+                <button class="color-option darkgray" data-color="darkgray" aria-label="Dark Gray"></button>
+                <button class="color-option slate" data-color="slate" aria-label="Slate"></button>
+                <button class="color-option charcoal" data-color="charcoal" aria-label="Charcoal"></button>
+                <button class="color-option black" data-color="black" aria-label="Black"></button>
+                <button class="color-option navy" data-color="navy" aria-label="Navy"></button>
+                <button class="color-option maroon" data-color="maroon" aria-label="Maroon"></button>
+                <button class="color-option burgundy" data-color="burgundy" aria-label="Burgundy"></button>
+                <button class="color-option plum" data-color="plum" aria-label="Plum"></button>
+                <button class="color-option lavender" data-color="lavender" aria-label="Lavender"></button>
+                <button class="color-option mint" data-color="mint" aria-label="Mint"></button>
+                <button class="color-option aqua" data-color="aqua" aria-label="Aqua"></button>
+                <button class="color-option turquoise" data-color="turquoise" aria-label="Turquoise"></button>
+                <button class="color-option steel" data-color="steel" aria-label="Steel"></button>
+                <button class="color-option ivory" data-color="ivory" aria-label="Ivory"></button>
+            </div>
+            <div class="paint-footer">
+                <div class="paintConfirm"><button id="paintConfirm" class="btn btn-primary"><i class="fa-solid fa-paintbrush"></i> Paint</button></div>
+                <div class="erase"><button class="btn btn-secondary" aria-label="Borracha"><i class="fa-solid fa-eraser"></i></button></div>
+            </div>
         </div>
     </div> 
     <div id="map"></div>
