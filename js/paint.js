@@ -1,3 +1,5 @@
+import { paintMode } from "./grid.js";
+
 const startPaintBtn = document.getElementById('startPaint');
 const colorsChoices = document.getElementById('colorsChoices');
 const closeColorsChoiceBtn = document.getElementById('closeColorsChoice');
@@ -8,6 +10,7 @@ let selectedColor = colorOptions[0]?.dataset.color || null;
 startPaintBtn.addEventListener('click', () => {
     startPaintBtn.classList.add('hidden');
     colorsChoices.classList.remove('hidden');
+    paintMode = true;
 });
 
 closeColorsChoiceBtn.addEventListener('click', () => {

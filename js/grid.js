@@ -6,6 +6,9 @@ const CHUNK_SIZE = 4;
 const GRID_SIZE = 4; 
 const REFERENCE_ZOOM = 15; 
 
+let selectedPixels = []
+export var paintMode = false;
+
 let hoveredChunk = null;
 
 function resizeCanvas() {
@@ -19,6 +22,7 @@ export function initGrid(map) {
     resizeCanvas();
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseleave', onMouseLeave);
+    document.addEventListener('click', onClick);
     window.addEventListener('resize', resizeCanvas);
 }
 
@@ -27,6 +31,40 @@ function latLngToGlobalPixels(lat, lng) {
     const x = ((lng + 180) / 360) * worldSize;
     const y = ((1 - Math.log(Math.tan((lat * Math.PI / 180)) + 1 / Math.cos((lat * Math.PI / 180))) / Math.PI) / 2) * worldSize;
     return { x, y };
+}
+function globalPixelsToLatLng(x, y) {
+    const worldSize = 256 * Math.pow(2, REFERENCE_ZOOM);
+    const lng = (x / worldSize) * 360 - 180;
+    const n = Math.PI - (2 * Math.PI * y) / worldSize;
+    const lat = (180 / Math.PI) * Math.atan(Math.sinh(n));
+    return { lat, lng };
+}
+
+function onClick(e) {
+    if (!currentMap || currentMap._animatingZoom) return;
+    const rect = canvas.getBoundingClientRect();
+    const zoom = currentMap.getZoom();
+    const scale = Math.pow(2, zoom - REFERENCE_ZOOM);
+    const center = currentMap.getCenter();
+    const centerGlobal = latLngToGlobalPixels(center.lat, center.lng);
+    
+    // Global pixel coordinates of the click
+    const globalX = centerGlobal.x + (e.clientX - rect.left - canvas.width / 2) / scale;
+    const globalY = centerGlobal.y + (e.clientY - rect.top - canvas.height / 2) / scale;
+    
+    // Grid coordinates
+    const gridX = Math.floor(globalX / GRID_SIZE);
+    const gridY = Math.floor(globalY / GRID_SIZE);
+
+    const coords = globalPixelsToLatLng(globalX, globalY);
+
+    selectedPixels.push({ gridX, gridY, lat: coords.lat, lng: coords.lng });
+    console.log("Selected Pixels:", selectedPixels);    
+
+    if(paintMode) {
+        
+    }
+   
 }
 
 function onMouseMove(e) {
