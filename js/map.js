@@ -57,6 +57,12 @@ map.on('moveend zoomend viewreset', () => {
     canvas.style.transition = 'none';
     canvas.style.transform = 'none';
     drawGrid();
+
+    if(map.getZoom() < 15){
+        showPicturesBtn.classList.remove('hidden');
+    } else {
+        showPicturesBtn.classList.add('hidden');
+    }
 });
 
 map.on('move', () => {
@@ -79,3 +85,18 @@ document.getElementById('zoom-out-btn').addEventListener('click', () => {
 document.getElementById('center-btn').addEventListener('click', () => {
     map.setView(markerPlayer.getLatLng(), 16, { animate: true });
 });
+
+const showPicturesBtn = document.getElementById('showPictures');
+showPicturesBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    map.setZoom(15);
+    showPicturesBtn.classList.toggle('hidden');
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    if(map.getZoom() < 15){
+        showPicturesBtn.classList.remove('hidden');
+    } else {
+        showPicturesBtn.classList.add('hidden');
+    }
+})
