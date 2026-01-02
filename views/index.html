@@ -89,17 +89,40 @@
     </div>
     <div class="loginInfo">
         <div class="userprofile">
-            <button class="btn btn-secondary"><img src="https://avatar.iran.liara.run/public" alt="User Profile"/></button>
-            <span id="userLevel">1</span>
+            <button id="loginModalBtn" class="btn btn-secondary"><i class="fa-solid fa-right-to-bracket"></i></button>
         </div>
         <div class="leaderbord">
-            <button class="btn btn-secondary"><i class="fa-solid fa-ranking-star"></i></button>
+            <button id="leaderboardBtn" class="btn btn-secondary"><i class="fa-solid fa-ranking-star"></i></button>
         </div>
         <div class="search-location">
             <button class="btn btn-secondary"><i class="fa-solid fa-magnifying-glass-location"></i></button>
         </div>
     </div>
 
+    <div class="modal modal-hidden" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="logo">WHOLE <br> WORLD</h2>
+                <span class="close-button"><i class="fa-solid fa-xmark"></i></span>
+            </div>
+            <div class="modal-body">
+                <button class="btn btn-secondary"><img src="https://auth.hackclub.com/assets/hc-square-DcGTXsPA.png"> Login with HackClub</button>
+                <span class="or">OR</span>
+                <button class="btn btn-secondary"><i class="fa-solid fa-user-secret"></i> Continue as Guest</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal modal-hidden" id="leaderbordModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="logo">LEADERBOARD</h2>
+                <span class="close-button"><i class="fa-solid fa-xmark"></i></span>
+            </div>
+            <div class="modal-body">
+                <p>Leaderboard content goes here...</p>
+            </div>
+        </div>
+    </div>
     
 
     <canvas id="grid-canvas"></canvas>
@@ -108,5 +131,7 @@
     <script type="module" src="/js/map.js"></script>
     <script type="module" src="/js/grid.js"></script>
     <script type="module" src="/js/paint.js"></script>
+    <script type="module" src="/js/login.js"></script>
+    <script type="module" src="/js/leaderboard.js"></script>
 </body>
 </html>
