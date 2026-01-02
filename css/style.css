@@ -365,39 +365,32 @@ body {
     border-radius: 90px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
-.loginInfo .userprofile .usericon{
-    position: relative;
+.userprofile .btn{
+    border-radius: 50%;
+    padding: 10px;
     width: 50px;
     height: 50px;
+}
+.userprofile .btn img{
+    width: 45px;
     border-radius: 50%;
+    margin: -9px 0 0 -9.25px;
 }
-.loginInfo .userprofile .usericon img{
-    position: relative;
-    width: 50px;
-    height: 50px;
-    border: 2px solid #3388ff;
-    border-radius: 50%;
-}
-.loginInfo .userprofile .usericon img:hover{
-    cursor: pointer;
-}
-.loginInfo .userprofile .usericon .userlevel{
+.userprofile #userLevel{
     position: absolute;
-    bottom: -5px;
-    right: -5px;
+    top: 34px;
+    left: 2px;
     background-color: #3388ff;
     color: white;
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
+    font-size: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
-    font-weight: bold;
     border: 2px solid white;
 }
-
 .leaderbord .btn{
     border-radius: 50%;
     padding: 10px;
