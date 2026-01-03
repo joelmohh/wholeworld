@@ -480,3 +480,51 @@ body {
     width: 25px;
     margin-bottom: -5px;
 }
+
+/* ========== Search Modal ========== */
+#searchModal .modal-content {
+    width: 90%;
+    max-width: 400px;
+}
+
+#locationInput {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+#searchResults {
+    margin-top: 15px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.search-result-item {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    transition: background-color 0.2s ease;
+}
+
+.search-result-item:hover {
+    background-color: #f0f0f0;
+}
+
+.search-result-item strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #1f2a44;
+}
+
+.search-result-item p {
+    margin: 5px 0;
+    font-size: 12px;
+    color: #666;
+}

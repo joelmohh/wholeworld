@@ -1,18 +1,40 @@
 import { initGrid, drawGrid } from './grid.js';
 
-var map = L.map('map', {
-    zoomControl: false,
-    minZoom: 3,
-    maxBounds: [[-85, -180], [85, 180]],
-    maxBoundsViscosity: 1.0,
-    attributionControl: false,
-    zoomSnap: 0
-}).setView([0, 0], 16);
+function generateUserId() {
+    const randomNum = Math.floor(Math.random() * 100000);
+    return `gest${randomNum}`;
+}
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd',
-    maxZoom: 20,
-}).addTo(map);
+let userId = localStorage.getItem('userId');
+if (!userId) {
+    userId = generateUserId();
+    localStorage.setItem('userId', userId);
+}
+
+const mapContainer = document.getElementById('map');
+if (!mapContainer) {
+    throw new Error('Map container not found');
+}
+
+let map = window.map;
+if (!map || typeof map.addLayer !== 'function') {
+    if (mapContainer._leaflet_id) {
+        mapContainer._leaflet_id = undefined;
+    }
+    map = L.map(mapContainer, {
+        zoomControl: false,
+        minZoom: 3,
+        maxBounds: [[-85, -180], [85, 180]],
+        maxBoundsViscosity: 1.0,
+        attributionControl: false,
+        zoomSnap: 0
+    }).setView([0, 0], 16);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        subdomains: 'abcd',
+        maxZoom: 20,
+    }).addTo(map);
+    window.map = map;
+}
 
 var mapMarker = L.divIcon({
     className: 'map-marker',
@@ -20,7 +42,7 @@ var mapMarker = L.divIcon({
     iconAnchor: [10, 10]
 });
 
-var markerPlayer = L.marker([0, 0], { icon: mapMarker }).addTo(map).bindPopup("Você está aqui!");
+var markerPlayer = L.marker([0, 0], { icon: mapMarker }).addTo(map).bindPopup("You are here!");
 
 function getUserLocation() {
     if (!navigator.geolocation) return;

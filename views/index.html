@@ -22,17 +22,17 @@
                 <button class="color-option red active" data-color="red" aria-label="Red"></button>
                 <button class="color-option crimson" data-color="crimson" aria-label="Crimson"></button>
                 <button class="color-option rose" data-color="rose" aria-label="Dark Rose"></button>
-                <button class="color-option pink" data-color="pink" aria-label="Rosa"></button>
-                <button class="color-option fuchsia" data-color="fuchsia" aria-label="Fúcsia"></button>
+                <button class="color-option pink" data-color="pink" aria-label="Pink"></button>
+                <button class="color-option fuchsia" data-color="fuchsia" aria-label="Fuchsia"></button>
                 <button class="color-option magenta" data-color="magenta" aria-label="Magenta"></button>
-                <button class="color-option purple" data-color="purple" aria-label="Roxo"></button>
-                <button class="color-option violet" data-color="violet" aria-label="Violeta"></button>
-                <button class="color-option indigo" data-color="indigo" aria-label="Índigo"></button>
-                <button class="color-option blue" data-color="blue" aria-label="Azul"></button>
-                <button class="color-option sky" data-color="sky" aria-label="Azul Céu"></button>
-                <button class="color-option cyan" data-color="cyan" aria-label="Ciano"></button>
-                <button class="color-option teal" data-color="teal" aria-label="Azul Petróleo"></button>
-                <button class="color-option emerald" data-color="emerald" aria-label="Esmeralda"></button>
+                <button class="color-option purple" data-color="purple" aria-label="Purple"></button>
+                <button class="color-option violet" data-color="violet" aria-label="Violet"></button>
+                <button class="color-option indigo" data-color="indigo" aria-label="Indigo"></button>
+                <button class="color-option blue" data-color="blue" aria-label="Blue"></button>
+                <button class="color-option sky" data-color="sky" aria-label="Sky"></button>
+                <button class="color-option cyan" data-color="cyan" aria-label="Cyan"></button>
+                <button class="color-option teal" data-color="teal" aria-label="Teal"></button>
+                <button class="color-option emerald" data-color="emerald" aria-label="Emerald"></button>
                 <button class="color-option green" data-color="green" aria-label="Green"></button>
                 <button class="color-option lime" data-color="lime" aria-label="Lime"></button>
                 <button class="color-option chartreuse" data-color="chartreuse" aria-label="Chartreuse"></button>
@@ -71,7 +71,7 @@
             </div>
             <div class="paint-footer">
                 <div class="paintConfirm"><button id="paintConfirm" class="btn btn-primary"><i class="fa-solid fa-paintbrush"></i> Paint</button></div>
-                <div class="erase"><button class="btn btn-secondary" aria-label="Borracha"><i class="fa-solid fa-eraser"></i></button></div>
+                <div class="erase"><button id="eraseBtn" class="btn btn-secondary" aria-label="Eraser"><i class="fa-solid fa-eraser"></i> Erase</button></div>
             </div>
         </div>
     </div> 
@@ -88,9 +88,6 @@
         </div>   
     </div>
     <div class="loginInfo">
-        <div class="userprofile">
-            <button id="loginModalBtn" class="btn btn-secondary"><i class="fa-solid fa-right-to-bracket"></i></button>
-        </div>
         <div class="leaderbord">
             <button id="leaderboardBtn" class="btn btn-secondary"><i class="fa-solid fa-ranking-star"></i></button>
         </div>
@@ -99,19 +96,6 @@
         </div>
     </div>
 
-    <div class="modal modal-hidden" id="loginModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="logo">WHOLE <br> WORLD</h2>
-                <span class="close-button"><i class="fa-solid fa-xmark"></i></span>
-            </div>
-            <div class="modal-body">
-                <button class="btn btn-secondary"><img src="https://auth.hackclub.com/assets/hc-square-DcGTXsPA.png"> Login with HackClub</button>
-                <span class="or">OR</span>
-                <button class="btn btn-secondary"><i class="fa-solid fa-user-secret"></i> Continue as Guest</button>
-            </div>
-        </div>
-    </div>
     <div class="modal modal-hidden" id="leaderbordModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -131,7 +115,7 @@
     <script type="module" src="/js/map.js"></script>
     <script type="module" src="/js/grid.js"></script>
     <script type="module" src="/js/paint.js"></script>
-    <script type="module" src="/js/login.js"></script>
     <script type="module" src="/js/leaderboard.js"></script>
+    <script src="/js/search.js"></script>
 </body>
 </html>

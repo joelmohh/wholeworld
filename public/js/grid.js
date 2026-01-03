@@ -1,4 +1,4 @@
-import { selectedColor as getSelectedColor } from './paint.js';
+import { selectedColor } from './paint.js';
 
 const canvas = document.getElementById("grid-canvas");
 const ctx = canvas.getContext("2d");
@@ -8,13 +8,85 @@ const CHUNK_SIZE = 4;
 const GRID_SIZE = 4;
 const REFERENCE_ZOOM = 15;
 
-let selectedPixels = []
+let selectedPixels = [];
 var paintMode = false;
-export function tooglePaintMode() {
-    if(paintMode){
-        paintMode = false;
-    } else {
-        paintMode = true;
+let spaceKeyPressed = false;
+let userId = null;
+let lastPaintedPixel = null;
+let eraseMode = false;
+
+export function togglePaintMode() {
+    paintMode = !paintMode;
+}
+
+export function setEraseMode(value) {
+    eraseMode = value;
+}
+
+function getUserId() {
+    if (!userId) {
+        userId = localStorage.getItem('userId');
+    }
+    return userId;
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && paintMode && !spaceKeyPressed) {
+        e.preventDefault();
+        spaceKeyPressed = true;
+    }
+});
+
+document.addEventListener('keyup', (e) => {
+    if (e.code === 'Space') {
+        spaceKeyPressed = false;
+        lastPaintedPixel = null;
+    }
+});
+
+async function paintPixel(gridX, gridY, lat, lng, isClick = false) {
+    if (!selectedColor || !paintMode) return;
+    
+    if (!isClick && !spaceKeyPressed) return;
+    
+    const key = `${gridX},${gridY}`;
+    if (!isClick && lastPaintedPixel === key) return;
+    
+    if (!isClick) {
+        lastPaintedPixel = key;
+    }
+    
+    const pixelData = {
+        gridX: gridX,
+        gridY: gridY,
+        lat: lat,
+        lng: lng,
+        color: selectedColor,
+        userId: getUserId(),
+        timestamp: Date.now()
+    };
+    
+    try {
+        const response = await fetch('/api/pixels', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pixels: [pixelData] })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            const newPixelMap = new Map();
+            selectedPixels.forEach(p => {
+                newPixelMap.set(`${p.gridX},${p.gridY}`, p);
+            });
+            result.savedPixels.forEach(p => {
+                newPixelMap.set(`${p.gridX},${p.gridY}`, p);
+            });
+            selectedPixels = Array.from(newPixelMap.values());
+            drawGrid();
+        }
+    } catch (error) {
+        console.error('Error saving pixels:', error);
     }
 }
 
@@ -85,6 +157,53 @@ export function initGrid(map) {
     document.addEventListener('mouseleave', onMouseLeave);
     document.addEventListener('click', onClick);
     window.addEventListener('resize', resizeCanvas);
+    
+    loadVisiblePixels();
+    
+    map.on('moveend', loadVisiblePixels);
+    map.on('zoomend', loadVisiblePixels);
+}
+
+async function loadVisiblePixels() {
+    if (!currentMap) return;
+    
+    const bounds = currentMap.getBounds();
+    const zoom = currentMap.getZoom();
+    
+    const ne = bounds.getNorthEast();
+    const sw = bounds.getSouthWest();
+    
+    const neGlobal = latLngToGlobalPixels(ne.lat, ne.lng);
+    const swGlobal = latLngToGlobalPixels(sw.lat, sw.lng);
+    
+    const minX = Math.floor(swGlobal.x / GRID_SIZE) - 10;
+    const maxX = Math.ceil(neGlobal.x / GRID_SIZE) + 10;
+    const minY = Math.floor(neGlobal.y / GRID_SIZE) - 10;
+    const maxY = Math.ceil(swGlobal.y / GRID_SIZE) + 10;
+    
+    try {
+        const response = await fetch(
+            `/api/pixels?minX=${minX}&maxX=${maxX}&minY=${minY}&maxY=${maxY}`
+        );
+        
+        if (response.ok) {
+            const data = await response.json();
+            
+            const newPixelMap = new Map();
+            selectedPixels.forEach(p => {
+                newPixelMap.set(`${p.gridX},${p.gridY}`, p);
+            });
+            
+            data.pixels.forEach(p => {
+                newPixelMap.set(`${p.gridX},${p.gridY}`, p);
+            });
+            
+            selectedPixels = Array.from(newPixelMap.values());
+            drawGrid();
+        }
+    } catch (error) {
+        console.error('Error loading pixels:', error);
+    }
 }
 
 function latLngToGlobalPixels(lat, lng) {
@@ -93,6 +212,7 @@ function latLngToGlobalPixels(lat, lng) {
     const y = ((1 - Math.log(Math.tan((lat * Math.PI / 180)) + 1 / Math.cos((lat * Math.PI / 180))) / Math.PI) / 2) * worldSize;
     return { x, y };
 }
+
 function globalPixelsToLatLng(x, y) {
     const worldSize = 256 * Math.pow(2, REFERENCE_ZOOM);
     const lng = (x / worldSize) * 360 - 180;
@@ -109,19 +229,79 @@ function onClick(e) {
     const center = currentMap.getCenter();
     const centerGlobal = latLngToGlobalPixels(center.lat, center.lng);
 
-    // Global pixel coordinates of the click
     const globalX = centerGlobal.x + (e.clientX - rect.left - canvas.width / 2) / scale;
     const globalY = centerGlobal.y + (e.clientY - rect.top - canvas.height / 2) / scale;
 
-    // Grid coordinates
     const gridX = Math.floor(globalX / GRID_SIZE);
     const gridY = Math.floor(globalY / GRID_SIZE);
 
-    const coords = globalPixelsToLatLng(globalX, globalY);
+    const paintedPixel = selectedPixels.find(p => p.gridX === gridX && p.gridY === gridY);
+    
+    if (eraseMode) {
+        if (paintedPixel) {
+            erasePixel(gridX, gridY);
+        }
+        return;
+    }
+    
+    if (paintedPixel && !eraseMode) {
+        const coords = globalPixelsToLatLng(globalX, globalY);
+        paintPixel(gridX, gridY, coords.lat, coords.lng, true);
+    } else if (!paintedPixel) {
+        const coords = globalPixelsToLatLng(globalX, globalY);
+        paintPixel(gridX, gridY, coords.lat, coords.lng, true);
+    }
+}
 
-    selectedPixels.push({ gridX, gridY, lat: coords.lat, lng: coords.lng, color: getSelectedColor });
-    console.log("Selected Pixels:", selectedPixels);
-    drawGrid();
+async function erasePixel(gridX, gridY) {
+    try {
+        const response = await fetch(`/api/pixels/${gridX},${gridY}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            selectedPixels = selectedPixels.filter(p => !(p.gridX === gridX && p.gridY === gridY));
+            drawGrid();
+        } else {
+            selectedPixels = selectedPixels.filter(p => !(p.gridX === gridX && p.gridY === gridY));
+            drawGrid();
+        }
+    } catch (error) {
+        console.error('Error erasing pixel:', error);
+    }
+}
+
+function showPixelInfo(pixel, x, y) {
+    const date = new Date(pixel.timestamp);
+    const dateStr = date.toLocaleString('en-US');
+    
+    const oldTooltip = document.getElementById('pixel-tooltip');
+    if (oldTooltip) oldTooltip.remove();
+    
+    const tooltip = document.createElement('div');
+    tooltip.id = 'pixel-tooltip';
+    tooltip.style.position = 'fixed';
+    tooltip.style.left = x + 10 + 'px';
+    tooltip.style.top = y + 10 + 'px';
+    tooltip.style.background = 'rgba(0, 0, 0, 0.85)';
+    tooltip.style.color = 'white';
+    tooltip.style.padding = '8px 12px';
+    tooltip.style.borderRadius = '6px';
+    tooltip.style.fontSize = '13px';
+    tooltip.style.zIndex = '10000';
+    tooltip.style.pointerEvents = 'none';
+    tooltip.style.fontFamily = 'monospace';
+    tooltip.innerHTML = `
+        <div><strong>Painted by:</strong> ${pixel.userId}</div>
+        <div><strong>When:</strong> ${dateStr}</div>
+        <div><strong>Color:</strong> ${pixel.color}</div>
+    `;
+    
+    document.body.appendChild(tooltip);
+    
+    setTimeout(() => {
+        tooltip.remove();
+    }, 3000);
 }
 
 function onMouseMove(e) {
@@ -141,6 +321,13 @@ function onMouseMove(e) {
     if (!hoveredChunk || hoveredChunk.chunkX !== chunkX || hoveredChunk.chunkY !== chunkY) {
         hoveredChunk = { chunkX, chunkY };
         drawGrid();
+    }
+    
+    if (spaceKeyPressed && paintMode) {
+        const gridX = Math.floor(globalX / GRID_SIZE);
+        const gridY = Math.floor(globalY / GRID_SIZE);
+        const coords = globalPixelsToLatLng(globalX, globalY);
+        paintPixel(gridX, gridY, coords.lat, coords.lng);
     }
 }
 
@@ -192,7 +379,17 @@ export function drawGrid() {
     }
     ctx.stroke();
     
+    const minGridX = Math.floor(topLeftGlobalX / GRID_SIZE);
+    const maxGridX = Math.ceil(bottomRightGlobalX / GRID_SIZE);
+    const minGridY = Math.floor(topLeftGlobalY / GRID_SIZE);
+    const maxGridY = Math.ceil(bottomRightGlobalY / GRID_SIZE);
+    
     selectedPixels.forEach(pixel => {
+        if (pixel.gridX < minGridX || pixel.gridX > maxGridX ||
+            pixel.gridY < minGridY || pixel.gridY > maxGridY) {
+            return;
+        }
+        
         const cX = pixel.gridX * GRID_SIZE;
         const cY = pixel.gridY * GRID_SIZE;
         const sX = (cX - centerGlobal.x) * scale + screenCenterX;
@@ -202,6 +399,10 @@ export function drawGrid() {
         const rgbColor = colorMap[pixel.color] || 'rgb(0, 100, 255)';
         ctx.fillStyle = rgbColor;
         ctx.fillRect(sX, sY, size, size);
+        
+        ctx.strokeStyle = 'rgba(128, 128, 128, 0.5)';
+        ctx.lineWidth = Math.max(0.3, scale * 0.15);
+        ctx.strokeRect(sX, sY, size, size);
     });
 
     if (hoveredChunk) {
