@@ -66,6 +66,16 @@ async function paintPixel(gridX, gridY, lat, lng, isClick = false) {
         timestamp: Date.now()
     };
     
+    // Optimistic update: desenhar localmente primeiro
+    const newPixelMap = new Map();
+    selectedPixels.forEach(p => {
+        newPixelMap.set(`${p.gridX},${p.gridY}`, p);
+    });
+    newPixelMap.set(key, pixelData);
+    selectedPixels = Array.from(newPixelMap.values());
+    drawGrid();
+    
+    // Depois enviar para o servidor
     try {
         const response = await fetch('/api/pixels', {
             method: 'POST',
@@ -73,19 +83,16 @@ async function paintPixel(gridX, gridY, lat, lng, isClick = false) {
             body: JSON.stringify({ pixels: [pixelData] })
         });
         
-        if (response.ok) {
-            const result = await response.json();
-            const newPixelMap = new Map();
-            selectedPixels.forEach(p => {
-                newPixelMap.set(`${p.gridX},${p.gridY}`, p);
-            });
-            result.savedPixels.forEach(p => {
-                newPixelMap.set(`${p.gridX},${p.gridY}`, p);
-            });
-            selectedPixels = Array.from(newPixelMap.values());
+        if (!response.ok) {
+            // Se falhar, apagar o pixel desenhado
+            selectedPixels = selectedPixels.filter(p => !(p.gridX === gridX && p.gridY === gridY));
             drawGrid();
+            console.error('Failed to save pixel');
         }
     } catch (error) {
+        // Se der erro de rede, apagar também
+        selectedPixels = selectedPixels.filter(p => !(p.gridX === gridX && p.gridY === gridY));
+        drawGrid();
         console.error('Error saving pixels:', error);
     }
 }
@@ -254,19 +261,24 @@ function onClick(e) {
 }
 
 async function erasePixel(gridX, gridY) {
+    // Optimistic update: apagar localmente primeiro
+    const oldPixels = selectedPixels.filter(p => !(p.gridX === gridX && p.gridY === gridY));
+    selectedPixels = oldPixels;
+    drawGrid();
+    
     try {
         const response = await fetch(`/api/pixels/${gridX},${gridY}`, {
             method: 'DELETE'
         });
         
-        if (response.ok) {
-            selectedPixels = selectedPixels.filter(p => !(p.gridX === gridX && p.gridY === gridY));
-            drawGrid();
-        } else {
-            selectedPixels = selectedPixels.filter(p => !(p.gridX === gridX && p.gridY === gridY));
-            drawGrid();
+        if (!response.ok) {
+            // Se falhar, recarregar pixels do servidor
+            await loadVisiblePixels();
+            console.error('Failed to delete pixel');
         }
     } catch (error) {
+        // Se der erro de rede, recarregar pixels do servidor
+        await loadVisiblePixels();
         console.error('Error erasing pixel:', error);
     }
 }
