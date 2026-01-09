@@ -5,6 +5,8 @@ const router = express.Router();
 
 const MONGO_URI = process.env.CONNECTION_STRING
 const PIXELS_COLLECTION = 'pixels';
+const DB_NAME = PIXELS_COLLECTION
+
 
 let cachedClient;
 let cachedDb;
