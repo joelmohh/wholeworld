@@ -1,115 +1,147 @@
 const express = require('express');
+const { MongoClient } = require('mongodb');
+
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
 
-const PIXELS_DB = path.join(__dirname, '..', 'pixels.json');
+const MONGO_URI = process.env.CONNECTION_STRING
+const PIXELS_COLLECTION = 'pixels';
 
-if (!fs.existsSync(PIXELS_DB)) {
-    fs.writeFileSync(PIXELS_DB, JSON.stringify({ pixels: {} }));
+let cachedClient;
+let cachedDb;
+
+async function getDb() {
+    if (cachedDb) {
+        return cachedDb;
+    }
+
+    if (!MONGO_URI) {
+        throw new Error('Missing MONGO_URI');
+    }
+
+    cachedClient = new MongoClient(MONGO_URI);
+    await cachedClient.connect();
+    cachedDb = cachedClient.db(DB_NAME);
+    await cachedDb.collection(PIXELS_COLLECTION).createIndex({ key: 1 }, { unique: true });
+    return cachedDb;
 }
 
-router.post('/', (req, res) => {
+function normalizePixel(pixel) {
+    const gridX = Number(pixel.gridX);
+    const gridY = Number(pixel.gridY);
+
+    if (Number.isNaN(gridX) || Number.isNaN(gridY)) {
+        throw new Error('Invalid grid coordinates');
+    }
+
+    return {
+        key: `${gridX},${gridY}`,
+        gridX,
+        gridY,
+        lat: Number(pixel.lat),
+        lng: Number(pixel.lng),
+        color: pixel.color,
+        userId: pixel.userId,
+        timestamp: pixel.timestamp ? Number(pixel.timestamp) : Date.now()
+    };
+}
+
+router.post('/', async (req, res) => {
     try {
         const { pixels } = req.body;
-        if (!pixels || !Array.isArray(pixels)) {
+
+        if (!Array.isArray(pixels) || pixels.length === 0) {
             return res.status(400).json({ error: 'Invalid pixels data' });
         }
 
-        const data = JSON.parse(fs.readFileSync(PIXELS_DB, 'utf8'));
-        const savedPixels = [];
+        const db = await getDb();
+        const collection = db.collection(PIXELS_COLLECTION);
 
-        pixels.forEach(pixel => {
-            const key = `${pixel.gridX},${pixel.gridY}`;
-            data.pixels[key] = {
-                gridX: pixel.gridX,
-                gridY: pixel.gridY,
-                lat: pixel.lat,
-                lng: pixel.lng,
-                color: pixel.color,
-                userId: pixel.userId,
-                timestamp: pixel.timestamp
-            };
-            savedPixels.push(data.pixels[key]);
-        });
+        const docs = pixels.map(normalizePixel);
+        const operations = docs.map(doc => ({
+            updateOne: {
+                filter: { key: doc.key },
+                update: { $set: doc },
+                upsert: true
+            }
+        }));
 
-        fs.writeFileSync(PIXELS_DB, JSON.stringify(data, null, 2));
-        res.json({ success: true, savedPixels });
+        if (operations.length) {
+            await collection.bulkWrite(operations, { ordered: false });
+        }
+
+        res.json({ success: true, savedPixels: docs });
     } catch (error) {
         console.error('Error saving pixels:', error);
         res.status(500).json({ error: 'Failed to save pixels' });
     }
 });
 
-router.delete('/:key', (req, res) => {
+router.delete('/:key', async (req, res) => {
     try {
         const key = req.params.key;
-        const data = JSON.parse(fs.readFileSync(PIXELS_DB, 'utf8'));
-        
-        if (data.pixels[key]) {
-            delete data.pixels[key];
-            fs.writeFileSync(PIXELS_DB, JSON.stringify(data, null, 2));
-            res.json({ success: true });
-        } else {
-            res.status(404).json({ error: 'Pixel not found' });
+
+        if (!key) {
+            return res.status(400).json({ error: 'Missing pixel key' });
         }
+
+        const db = await getDb();
+        const collection = db.collection(PIXELS_COLLECTION);
+        const result = await collection.deleteOne({ key });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: 'Pixel not found' });
+        }
+
+        res.json({ success: true });
     } catch (error) {
         console.error('Error deleting pixel:', error);
         res.status(500).json({ error: 'Failed to delete pixel' });
     }
 });
 
-
-
-
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const { minX, maxX, minY, maxY } = req.query;
-        const data = JSON.parse(fs.readFileSync(PIXELS_DB, 'utf8'));
-        
-        if (!data.pixels) {
-            data.pixels = {};
-            fs.writeFileSync(PIXELS_DB, JSON.stringify(data, null, 2));
-        }
-        
-        if (!minX || !maxX || !minY || !maxY) {
-            return res.json({ pixels: Object.values(data.pixels) });
+        const db = await getDb();
+        const collection = db.collection(PIXELS_COLLECTION);
+
+        const hasBounds = [minX, maxX, minY, maxY].every(v => v !== undefined);
+        const query = {};
+
+        if (hasBounds) {
+            const xMin = Number(minX);
+            const xMax = Number(maxX);
+            const yMin = Number(minY);
+            const yMax = Number(maxY);
+
+            if ([xMin, xMax, yMin, yMax].some(Number.isNaN)) {
+                return res.status(400).json({ error: 'Invalid bounds' });
+            }
+
+            query.gridX = { $gte: xMin, $lte: xMax };
+            query.gridY = { $gte: yMin, $lte: yMax };
         }
 
-        const visiblePixels = Object.values(data.pixels).filter(pixel => {
-            return pixel.gridX >= parseInt(minX) && pixel.gridX <= parseInt(maxX) &&
-                   pixel.gridY >= parseInt(minY) && pixel.gridY <= parseInt(maxY);
-        });
-
-        res.json({ pixels: visiblePixels });
+        const pixels = await collection.find(query).toArray();
+        res.json({ pixels });
     } catch (error) {
         console.error('Error loading pixels:', error);
         res.status(500).json({ error: 'Failed to load pixels' });
     }
 });
 
-router.get('/leaderboard', (req, res) => {
+router.get('/leaderboard', async (req, res) => {
     try {
-        const data = JSON.parse(fs.readFileSync(PIXELS_DB, 'utf8'));
-        
-        if (!data.pixels) {
-            data.pixels = {};
-            fs.writeFileSync(PIXELS_DB, JSON.stringify(data, null, 2));
-        }
-        
-        const userStats = {};
+        const db = await getDb();
+        const collection = db.collection(PIXELS_COLLECTION);
 
-        Object.values(data.pixels).forEach(pixel => {
-            if (!userStats[pixel.userId]) {
-                userStats[pixel.userId] = 0;
-            }
-            userStats[pixel.userId]++;
-        });
-
-        const leaderboard = Object.entries(userStats)
-            .map(([userId, count]) => ({ userId, pixelsPainted: count }))
-            .sort((a, b) => b.pixelsPainted - a.pixelsPainted)
-            .slice(0, 50);
+        const leaderboard = await collection.aggregate([
+            { $match: { userId: { $exists: true, $ne: null } } },
+            { $group: { _id: '$userId', pixelsPainted: { $sum: 1 } } },
+            { $sort: { pixelsPainted: -1 } },
+            { $limit: 50 },
+            { $project: { _id: 0, userId: '$_id', pixelsPainted: 1 } }
+        ]).toArray();
 
         res.json({ leaderboard });
     } catch (error) {
